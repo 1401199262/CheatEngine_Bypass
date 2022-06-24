@@ -1,0 +1,87 @@
+;
+; CheatEngine_Bypass.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=CheatEngine_Bypass.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockDown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+CheatEngine_Bypass_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+CheatEngine_Bypass.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%CheatEngine_Bypass.DeviceDesc%=CheatEngine_Bypass_Device, Root\CheatEngine_Bypass ; TODO: edit hw-id
+
+[CheatEngine_Bypass_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+CheatEngine_Bypass.sys
+
+;-------------- Service installation
+[CheatEngine_Bypass_Device.NT.Services]
+AddService = CheatEngine_Bypass,%SPSVCINST_ASSOCSERVICE%, CheatEngine_Bypass_Service_Inst
+
+; -------------- CheatEngine_Bypass driver install sections
+[CheatEngine_Bypass_Service_Inst]
+DisplayName    = %CheatEngine_Bypass.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CheatEngine_Bypass.sys
+
+;
+;--- CheatEngine_Bypass_Device Coinstaller installation ------
+;
+
+[CheatEngine_Bypass_Device.NT.CoInstallers]
+AddReg=CheatEngine_Bypass_Device_CoInstaller_AddReg
+CopyFiles=CheatEngine_Bypass_Device_CoInstaller_CopyFiles
+
+[CheatEngine_Bypass_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[CheatEngine_Bypass_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[CheatEngine_Bypass_Device.NT.Wdf]
+KmdfService =  CheatEngine_Bypass, CheatEngine_Bypass_wdfsect
+[CheatEngine_Bypass_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "CheatEngine_Bypass Installation Disk"
+CheatEngine_Bypass.DeviceDesc = "CheatEngine_Bypass Device"
+CheatEngine_Bypass.SVCDESC = "CheatEngine_Bypass Service"
